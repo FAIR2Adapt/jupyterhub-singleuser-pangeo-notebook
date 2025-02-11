@@ -10,6 +10,8 @@ FROM quay.io/pangeo/pangeo-notebook:2024.11.11
 LABEL maintainer = "annef@simula.no"
 USER root
 
+RUN pip install jupyterhub==3.*
+
 # Setup ENV for Appstore to be picked up
 ENV APP_UID=999 \
 	APP_GID=999 \

@@ -5,7 +5,7 @@
 # Base: https://github.com/jupyter/docker-stacks/tree/d400e383cc1d/base-notebook/Dockerfile
 
 
-FROM quay.io/pangeo/pangeo-notebook:2025.01.24 
+FROM quay.io/pangeo/pangeo-notebook:2024.11.11
 
 LABEL maintainer = "annef@simula.no"
 USER root

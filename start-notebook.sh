@@ -14,8 +14,9 @@ HOME=$(eval echo "$HOME")
 JUPYTERHUB_USER=$REAL_JUPYTERHUB_USER # Swich back after expanding, as Jupyterhub breaks otherwise.
 
 mkdir -p "$HOME"
-mv /home/notebook /home/oldnotebook
-ln -s "$HOME" /home/notebook
+if [ ! -L "/home/notebook" ]; then
+    ln -s "$HOME" /home/notebook
+fi
 
 # Exec the specified command or fall back on bash
 if [ $# -eq 0 ]; then
@@ -30,33 +31,27 @@ fi
 
 if [ -f "/tmp/ipcontroller-client.json" ]; then
   mkdir -p "$HOME/.ipython/profile_default/security/"
+  chown -R notebook:notebook "$HOME/.ipython/profile_default/security/"
   ls -lah "$HOME/.ipython/profile_default/security/"
   cp "/tmp/ipcontroller-client.json" "$HOME/.ipython/profile_default/security/" || true
 fi
 
-if [ ! -f "$HOME/.jupyter/jupyter_server_config.py" ]; then
-	cp -r "/opt/.jupyter/jupyter_server_config.py" "$HOME/.jupyter"
-fi
+cp -r "/opt/uio/jupyter_server_config.py" "$HOME/.jupyter"
 
 # If we have shared data directories mounted, make the folders available in the users home directory.
 if [ -d "/mnt" ]; then
     for dir in /mnt/*/; do
       if [ -d "$dir" ]; then
-        dirname=${dir%*/}     # remove the trailing "/"
-        dirname=${dirname##*/}    # everything after the final "/"
+        dirname=${dir%*/}  
+        dirname=${dirname##*/}  
         if [ -L "$HOME/shared-$dirname" ]; then
           rm -f "$HOME/shared-$dirname"
         fi
-
         ln -sf "/mnt/$dirname" "$HOME/shared-$dirname"
+	chown -R notebook:notebook "$HOME/shared-$dirname"
       fi
     done
 fi
 
-
 cd "$HOME"
-if [[ ! -z "${JUPYTER_ENABLE_LAB}" ]]; then
-  jupyterhub-singleuser --config "$HOME/.jupyter/jupyter_server_config.py" --SingleUserLabApp.default_url="/lab"
-else
-  jupyterhub-singleuser --config "$HOME/.jupyter/jupyter_server_config.py" --SingleUserLabApp.default_url="/tree"
-fi
+jupyterhub-singleuser --config "$HOME/.jupyter/jupyter_server_config.py" 

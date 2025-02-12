@@ -1,6 +1,6 @@
 FROM sigma2as/jupyterhub-singleuser-base-notebook:20231017-75e6934
 
-LABEL maintainer="jeani@nris.no"
+LABEL maintainer="annef@simula.no"
 
 USER root
 RUN apt update && apt install -y vim nano groff tree
@@ -13,9 +13,7 @@ COPY conda-linux-64.lock /home/notebook/conda-linux-64.lock
 RUN conda create -n pangeo --file conda-linux-64.lock && \
     conda clean --all -y
 
-RUN source activate pangeo && \
-    /opt/conda/bin/ipython kernel install --user --name pangeo && \
-    /opt/conda/bin/python -m ipykernel install --user --name=pangeo
+RUN $CONDA_PREFIX/envs/pangeo/bin/python -m ipykernel install --name pangeo --prefix $CONDA_PREFIX
 
 COPY start-notebook.sh /home/notebook/
 

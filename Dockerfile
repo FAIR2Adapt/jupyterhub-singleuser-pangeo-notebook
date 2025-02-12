@@ -12,6 +12,6 @@ COPY conda-linux-64.lock /home/notebook/conda-linux-64.lock
 RUN conda create -n pangeo --file conda-linux-64.lock && \
     conda clean --all -y
 
-RUN $CONDA_PREFIX/envs/pangeo/bin/python -m ipykernel install --name pangeo --prefix $CONDA_PREFIX
+RUN /opt/conda/envs/pangeo/bin/python -m ipykernel install --name pangeo --prefix /opt/conda
 
 USER notebook
